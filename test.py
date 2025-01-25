@@ -1,2 +1,1 @@
-from zbToolLib import *
-f=ZbToolLib()
+import zbToolLib as f
