@@ -1,4 +1,4 @@
-from .system import System
+from .system import *
 import os, sys, shutil, send2trash, winshell, filecmp,logging
 
 
@@ -90,7 +90,7 @@ def deleteFile( path: str, trash: bool = False, force: bool = False):
         if trash:
             send2trash.send2trash(path)
         elif force:
-            System().easyCmd(f'del /F /Q /S "{path}"', True)
+            easyCmd(f'del /F /Q /S "{path}"', True)
         else:
             os.remove(path)
     except Exception as ex:
@@ -111,7 +111,7 @@ def deleteDir( path: str, trash: bool = False, force: bool = False):
         if trash:
             send2trash.send2trash(path)
         elif force:
-            System().easyCmd(f'rmdir /S /Q "{path}"', True)
+            easyCmd(f'rmdir /S /Q "{path}"', True)
         else:
             shutil.rmtree(path)
     except Exception as ex:
