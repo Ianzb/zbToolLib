@@ -1,8 +1,12 @@
 from .system import *
-import os, sys, shutil, send2trash, winshell, filecmp,logging
+from .info import SYSTEM_TYPE
+import os, sys, shutil, send2trash, filecmp, logging
+
+if SYSTEM_TYPE == "Windows":
+    import winshell
 
 
-def fileSizeAddUnit( value: int):
+def fileSizeAddUnit(value: int):
     """
     文件比特大小加单位（1024进制）。
     @param value: 值
@@ -16,7 +20,8 @@ def fileSizeAddUnit( value: int):
         value = value / size
     return f"{value:.2f}BB"
 
-def formatPathString( path: str):
+
+def formatPathString(path: str):
     """
     格式化路径
     @param path: 路径
@@ -24,7 +29,8 @@ def formatPathString( path: str):
     """
     return os.path.normpath(path)
 
-def joinPath( *paths):
+
+def joinPath(*paths):
     """
     拼接路径。
     @param paths: 多个字符串参数
@@ -32,7 +38,8 @@ def joinPath( *paths):
     """
     return formatPathString(os.path.join("", *paths))
 
-def isSamePath( path1: str, path2: str):
+
+def isSamePath(path1: str, path2: str):
     """
     判断路径是否相同
     @param path1: 路径1
@@ -41,7 +48,8 @@ def isSamePath( path1: str, path2: str):
     """
     return os.path.samefile(path1, path2) if existPath(path1) and existPath(path2) else False
 
-def existPath( path: str):
+
+def existPath(path: str):
     """
     判断路径是否存在。
     @param path: 路径
@@ -49,7 +57,8 @@ def existPath( path: str):
     """
     return os.path.exists(path)
 
-def isFile( path: str):
+
+def isFile(path: str):
     """
     判断路径是否为文件
     @param path: 路径
@@ -57,7 +66,8 @@ def isFile( path: str):
     """
     return os.path.isfile(path) if existPath(path) else False
 
-def isDir( path: str):
+
+def isDir(path: str):
     """
     判断路径是否为目录
     @param path: 路径
@@ -65,7 +75,8 @@ def isDir( path: str):
     """
     return os.path.isdir(path) if existPath(path) else False
 
-def renamePath( old: str, new: str):
+
+def renamePath(old: str, new: str):
     """
     重命名路径
     @param old: 旧路径
@@ -75,7 +86,8 @@ def renamePath( old: str, new: str):
     os.rename(old, new)
     return existPath(new)
 
-def deleteFile( path: str, trash: bool = False, force: bool = False):
+
+def deleteFile(path: str, trash: bool = False, force: bool = False):
     """
     删除文件
     @param path: 文件路径
@@ -96,7 +108,8 @@ def deleteFile( path: str, trash: bool = False, force: bool = False):
     except Exception as ex:
         logging.error(f"删除文件{path}失败，错误信息为{ex}，回收站删除模式为{trash}，强制删除模式为{force}。")
 
-def deleteDir( path: str, trash: bool = False, force: bool = False):
+
+def deleteDir(path: str, trash: bool = False, force: bool = False):
     """
     删除目录
     @param path: 目录路径
@@ -118,7 +131,8 @@ def deleteDir( path: str, trash: bool = False, force: bool = False):
         logging.error(f"删除文件夹{path}失败，错误信息为{ex}，回收站删除模式为{trash}，强制删除模式为{force}。")
     return existPath(path)
 
-def deletePath( path: str, trash: bool = False, force: bool = False):
+
+def deletePath(path: str, trash: bool = False, force: bool = False):
     """
     删除文件或目录
     @param path: 文件或目录路径
@@ -131,7 +145,8 @@ def deletePath( path: str, trash: bool = False, force: bool = False):
     elif isDir(path):
         deleteDir(path, trash, force)
 
-def splitPath( path: str, mode: int | str = 0):
+
+def splitPath(path: str, mode: int | str = 0):
     """
     分割路径信息
     @param path: 文件路径
@@ -149,7 +164,8 @@ def splitPath( path: str, mode: int | str = 0):
     elif mode == 3:
         return os.path.dirname(path)
 
-def createDir( path: str):
+
+def createDir(path: str):
     """
     创建目录
     @param path: 目录路径
@@ -157,7 +173,8 @@ def createDir( path: str):
     if not existPath(path):
         os.makedirs(path)
 
-def fileSize( path: str):
+
+def fileSize(path: str):
     """
     获取文件大小
     @param path: 文件路径
@@ -168,7 +185,8 @@ def fileSize( path: str):
     elif isDir(path):
         return sum([fileSize(joinPath(path, file)) for file in walkFile(path)])
 
-def fileHash( path: str, mode: str = "md5"):
+
+def fileHash(path: str, mode: str = "md5"):
     """
     获取文件哈希值
     @param path: 文件路径
@@ -188,7 +206,8 @@ def fileHash( path: str, mode: str = "md5"):
         from hashlib import sha256
         return sha256(open(path, 'rb').read()).hexdigest()
 
-def walkFile( path: str, mode: int = 0):
+
+def walkFile(path: str, mode: int = 0):
     """
     遍历目录
     @param path: 目录路径
@@ -209,7 +228,8 @@ def walkFile( path: str, mode: int = 0):
                     l1.append(joinPath(path, i))
     return sorted(l1)
 
-def walkDir( path: str, mode: int = 0):
+
+def walkDir(path: str, mode: int = 0):
     """
     遍历子文件夹
     @param path: 目录路径
@@ -230,7 +250,8 @@ def walkDir( path: str, mode: int = 0):
                     l1.append(joinPath(path, i))
     return sorted(l1)
 
-def walkPath( path: str, mode: int = 0):
+
+def walkPath(path: str, mode: int = 0):
     """
     遍历子文件和子文件夹
     @param path: 目录路径
@@ -250,7 +271,8 @@ def walkPath( path: str, mode: int = 0):
                 l1.append(joinPath(path, i))
     return sorted(l1)
 
-def setOnlyRead( path: str, enable: bool):
+
+def setOnlyRead(path: str, enable: bool):
     """
     只读权限
     @param path: 文件路径
@@ -263,7 +285,8 @@ def setOnlyRead( path: str, enable: bool):
         else:
             os.chmod(path, S_IWRITE)
 
-def addRepeatSuffix( path: str):
+
+def addRepeatSuffix(path: str):
     """
     添加重复后缀（用于复制文件的时候解决名称重复问题）
     @param path: 新文件本身路径
@@ -281,7 +304,8 @@ def addRepeatSuffix( path: str):
         path = path + " (" + str(i) + ")"
     return path
 
-def _dirPathToSelfPath( old: str, new: str):
+
+def _dirPathToSelfPath(old: str, new: str):
     """
     新文件夹所在路径转文件本身路径，用于复制文件等操作时，将传入的作为复制后文件所在位置的路径替换为复制后文件自身的路径
     @param old: 旧文件（夹）自身路径
@@ -294,7 +318,8 @@ def _dirPathToSelfPath( old: str, new: str):
         new = joinPath(new, splitPath(old, 0))
     return new
 
-def copyPath( old: str, new: str, replace: bool = False):
+
+def copyPath(old: str, new: str, replace: bool = False):
     """
     复制文件
     @param old: 旧文件（夹）自身路径
@@ -325,7 +350,8 @@ def copyPath( old: str, new: str, replace: bool = False):
             return False
     return new if existPath(new) else False
 
-def movePath( old: str, new: str, replace: bool = False):
+
+def movePath(old: str, new: str, replace: bool = False):
     """
     移动文件（夹）
     @param old: 旧文件（夹）自身路径
@@ -340,7 +366,8 @@ def movePath( old: str, new: str, replace: bool = False):
         deletePath(old)
     return new if existPath(new) and not existPath(old) else False
 
-def clearDir( path: str):
+
+def clearDir(path: str):
     """
     清空文件夹（无法删除则跳过）
     @param path: 路径
@@ -349,7 +376,8 @@ def clearDir( path: str):
         for i in walkPath(path, 1):
             deletePath(i)
 
-def showFile( path: str):
+
+def showFile(path: str):
     """
     在文件资源管理器中打开目录
     @param path: 路径
@@ -359,7 +387,8 @@ def showFile( path: str):
     else:
         os.startfile(path)
 
-def extractZip( path: str, goal: str, delete: bool = False):
+
+def extractZip(path: str, goal: str, delete: bool = False):
     """
     解压zip文件
     @param path: zip文件路径

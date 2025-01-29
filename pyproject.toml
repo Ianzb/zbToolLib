@@ -1,13 +1,13 @@
 [project]
 name = "zbToolLib"
-version = "1.2.0"
+version = "1.2.0b1"
 description = "zb工具库"
 requires-python = ">=3.12"
 dependencies = [
     "send2trash>=1.8.3",
-    "winshell>=0.6",
-    "pywin32>=302",
     "requests>=2.32.3",
+    "winshell>=0.6; sys_platform == 'win32'",
+    "pywin32>=302; sys_platform == 'win32'",
 ]
 authors = [
     { name = "Ianzb", email = "93322252@qq.com" },
@@ -24,8 +24,8 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Operating System :: Microsoft :: Windows",
-    "Operating System :: Microsoft :: Windows :: Windows 11",
-    "Operating System :: Microsoft :: Windows :: Windows 10",
+    "Operating System :: MacOS :: MacOS X",
+    "Operating System :: POSIX :: Linux",
 ]
 
 [build-system]
