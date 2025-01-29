@@ -3,9 +3,7 @@ chcp 65001
 @echo off
 setlocal enabledelayedexpansion
 
-echo #############################################
-echo #           zbToolLib 打包工具             #
-echo #############################################
+echo zbToolLib打包工具
 echo.
 
 :: 设置相对路径
