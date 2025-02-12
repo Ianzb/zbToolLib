@@ -138,7 +138,7 @@ class DownloadManager:
         @param exist: 是否在已有文件的情况下下载（False时force无效）
         @param force: 是否强制下载（替换已有文件）
         @param header: 请求头
-        @return:
+        @return: 下载对象
         """
         d = DownloadSession()
         d.download(url, path, self, exist, force, header)
@@ -192,18 +192,33 @@ class DownloadSession:
         self.session = manager.downloadThreadPool.submit(self._download, url, path, exist, force, header)
 
     def cancel(self):
+        """
+        取消下载
+        """
         self._cancel = True
 
     def progress(self):
+        """
+        下载进度
+        :return: 0-100之间的小数进度
+        """
         return self._progress
 
     def isFinished(self):
+        """
+        任务完成状态
+        :return: 是否完成
+        """
         if self._result is not None:
             return True
         else:
             return False
 
     def result(self):
+        """
+        任务结果
+        :return: skip,cancel,success,fail
+        """
         return self._result
 
     def outputPath(self):
