@@ -50,11 +50,11 @@ def getUrl(url: str, header=None, timeout: int | tuple = (5, 10), times: int = 5
     logging.error(f"Get请求{url}失败！")
 
 
-def postUrl(url: str, json: dict, header=None, timeout: int | tuple = (5, 10), times: int = 5):
+def postUrl(url: str, data, header=None, timeout: int | tuple = (5, 10), times: int = 5):
     """
     可重试的post请求
     @param url: 链接
-    @param json: 发送数据
+    @param data: 发送数据/json（自动识别）
     @param header: 请求头
     @param timeout: 超时
     @param times: 重试次数
@@ -66,7 +66,10 @@ def postUrl(url: str, json: dict, header=None, timeout: int | tuple = (5, 10), t
         url = "http://" + url
     for i in range(times):
         try:
-            response = requests.post(url, headers=header, json=json, timeout=timeout)
+            if isinstance(data, dict):
+                response = requests.post(url, headers=header, json=data, timeout=timeout)
+            else:
+                response = requests.post(url, headers=header, data=data, timeout=timeout)
             logging.info(f"Post请求{url}成功！")
             return response
         except Exception as ex:
