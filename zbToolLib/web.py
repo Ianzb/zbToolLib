@@ -1,6 +1,6 @@
 from .file import *
 from .info import *
-import logging, requests
+import logging, requests, re, os
 from concurrent.futures import ThreadPoolExecutor
 
 
@@ -10,7 +10,8 @@ def isUrl(url: str):
     @param url: 网址字符串
     @return: 布尔值
     """
-    return url.startswith("http://") or url.startswith("https://")
+
+    return bool(re.compile(r"(https?|ftp|file)://[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]").match(url))
 
 
 def joinUrl(*urls):
@@ -24,6 +25,16 @@ def joinUrl(*urls):
     for i in urls:
         data = urljoin(data, i)
     return data
+
+
+def splitUrl(url: str):
+    """
+    分割网址
+    @param url: 网址
+    @return: urlparse对象，使用scheme、netloc、path、params、query、fragment获取片段
+    """
+    from urllib.parse import urlparse
+    return urlparse(url)
 
 
 def getUrl(url: str, header=None, timeout: int | tuple = (5, 10), times: int = 5):
@@ -84,9 +95,7 @@ def getFileNameFromUrl(url: str):
     @param url: 链接
     @return:
     """
-    from urllib.parse import urlparse
-    import os
-    return os.path.basename(urlparse(url).path)
+    return os.path.basename(splitUrl(url).path)
 
 
 def singleDownload(url: str, path: str, exist: bool = True, force: bool = False, header: dict = REQUEST_HEADER):

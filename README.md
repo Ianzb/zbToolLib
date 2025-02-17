@@ -14,4 +14,4 @@ zb工具库（zbToolLib）是一个Python工具库，提供了文件处理、网
 2025-01-15：1.1.0：重新发布。  
 2025-01-29：1.2.0b1：整理代码，删除日志模块配置，整理代码，删除多线程下载模块DownloadKit相关功能，重写多线程下载模块，尝试适配MacOS和Linux系统。  
 2025-02-12：1.2.0：完善docstring。  
-2025-02-17：1.2.1：post模块支持自动识别data类型数据。  
+2025-02-17：1.2.1&2：post模块支持自动识别data类型数据，优化isUrl和getFileNameFromUrl，新增splitUrl。  
