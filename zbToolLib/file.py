@@ -383,7 +383,7 @@ def showFile(path: str):
     @param path: 路径
     """
     if isFile(path):
-        System().easyCmd(f'explorer /select,"{path}"')
+        easyCmd(f'explorer /select,"{path}"')
     else:
         os.startfile(path)
 
