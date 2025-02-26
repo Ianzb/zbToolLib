@@ -1,6 +1,6 @@
 from .file import *
 from .info import *
-import logging, requests, re, os
+import logging, requests, re, os, requests
 from concurrent.futures import ThreadPoolExecutor
 
 
@@ -37,7 +37,7 @@ def splitUrl(url: str):
     return urlparse(url)
 
 
-def getUrl(url: str, header=None, timeout: int | tuple = (5, 10), times: int = 5):
+def getUrl(url: str, header: dict = REQUEST_HEADER, timeout: int | tuple = (5, 10), times: int = 5):
     """
     可重试的get请求
     @param url: 链接
@@ -46,10 +46,7 @@ def getUrl(url: str, header=None, timeout: int | tuple = (5, 10), times: int = 5
     @param times: 重试次数
     @return:
     """
-    import requests
     logging.info(f"正在Get请求{url}的信息！")
-    if not url.startswith("https://") and not url.startswith("http://"):
-        url = "http://" + url
     for i in range(times):
         try:
             response = requests.get(url, headers=header, stream=True, timeout=timeout)
@@ -61,26 +58,26 @@ def getUrl(url: str, header=None, timeout: int | tuple = (5, 10), times: int = 5
     logging.error(f"Get请求{url}失败！")
 
 
-def postUrl(url: str, data, header=None, timeout: int | tuple = (5, 10), times: int = 5):
+def postUrl(url: str, data: dict, json: dict, header: dict = REQUEST_HEADER, timeout: int | tuple = (5, 10), times: int = 5):
     """
     可重试的post请求
     @param url: 链接
-    @param data: 发送数据/json（自动识别）
+    @param data: 发送表单数据
+    @param json：发送json数据
     @param header: 请求头
     @param timeout: 超时
     @param times: 重试次数
     @return:
     """
-    import requests
     logging.info(f"正在Post请求{url}的信息！")
-    if not url.startswith("https://") and not url.startswith("http://"):
-        url = "http://" + url
     for i in range(times):
         try:
-            if isinstance(data, dict):
-                response = requests.post(url, headers=header, json=data, timeout=timeout)
-            else:
+            if json:
+                response = requests.post(url, headers=header, json=json, timeout=timeout)
+            elif data:
                 response = requests.post(url, headers=header, data=data, timeout=timeout)
+            else:
+                raise ValueError("data和json不能同时为空！")
             logging.info(f"Post请求{url}成功！")
             return response
         except Exception as ex:
