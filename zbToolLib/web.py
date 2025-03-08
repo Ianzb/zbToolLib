@@ -58,7 +58,7 @@ def getUrl(url: str, header: dict = REQUEST_HEADER, timeout: int | tuple = (5, 1
     logging.error(f"Get请求{url}失败！")
 
 
-def postUrl(url: str, data: dict, json: dict, header: dict = REQUEST_HEADER, timeout: int | tuple = (5, 10), times: int = 5):
+def postUrl(url: str, data: dict = None, json: dict = None, header: dict = REQUEST_HEADER, timeout: int | tuple = (5, 10), times: int = 5):
     """
     可重试的post请求
     @param url: 链接
