@@ -401,7 +401,7 @@ def startFile(path: str, bind: bool = False):
         if bind:
             easyCmd(f'"{path}"')
         else:
-            easyCmd(f'start "{path}"')
+            easyCmd(f'start "" /B "{path}"')
 
 
 def extractZip(path: str, goal: str, delete: bool = False):
