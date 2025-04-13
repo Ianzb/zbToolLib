@@ -1,9 +1,12 @@
-from .system import *
+import shutil
+
+import send2trash
+
 from .info import SYSTEM_TYPE
-import os, sys, shutil, send2trash, filecmp, logging
+from .system import *
 
 if SYSTEM_TYPE == "Windows":
-    import winshell
+    pass
 
 
 def fileSizeAddUnit(value: int):
@@ -384,8 +387,21 @@ def showFile(path: str):
     """
     if isFile(path):
         easyCmd(f'explorer /select,"{path}"')
-    else:
+    elif isDir(path):
         os.startfile(path)
+
+
+def startFile(path: str, bind: bool = False):
+    """
+    运行文件（不与程序进程绑定）
+    :param path: 路径
+    :param bind: 是否与当前进程绑定
+    """
+    if isFile(path):
+        if bind:
+            easyCmd(f'"{path}"')
+        else:
+            easyCmd(f'start "{path}"')
 
 
 def extractZip(path: str, goal: str, delete: bool = False):

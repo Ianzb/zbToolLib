@@ -49,7 +49,7 @@ def getUrl(url: str, header: dict = REQUEST_HEADER, timeout: int | tuple = (5, 1
     logging.info(f"正在Get请求{url}的信息！")
     for i in range(times):
         try:
-            response = requests.get(url, headers=header, stream=True, timeout=timeout)
+            response = requests.get(url, headers=header, stream=True, timeout=timeout, verify=False)
             logging.info(f"Get请求{url}成功！")
             return response
         except Exception as ex:
@@ -73,9 +73,9 @@ def postUrl(url: str, data: dict = None, json: dict = None, header: dict = REQUE
     for i in range(times):
         try:
             if json:
-                response = requests.post(url, headers=header, json=json, timeout=timeout)
+                response = requests.post(url, headers=header, json=json, timeout=timeout, verify=False)
             elif data:
-                response = requests.post(url, headers=header, data=data, timeout=timeout)
+                response = requests.post(url, headers=header, data=data, timeout=timeout, verify=False)
             else:
                 raise ValueError("data和json不能同时为空！")
             logging.info(f"Post请求{url}成功！")
