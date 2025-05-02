@@ -1,7 +1,7 @@
 from .file import *
 from .info import *
 import logging, requests, re, os, requests
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, wait
 
 
 def isUrl(url: str):
@@ -131,7 +131,7 @@ def singleDownload(url: str, path: str, exist: bool = True, force: bool = False,
 
 class DownloadManager:
     downloadThreadPool = ThreadPoolExecutor(max_workers=32)
-
+    futures=[]
     def setMaxThread(self, num: int):
         if num <= 0:
             logging.error(f"设置多线程下载线程数{num}无效！")
@@ -151,8 +151,14 @@ class DownloadManager:
         """
         d = DownloadSession()
         d.download(url, path, self, exist, force, header)
+        self.futures.append(d.session)
         return d
-
+    def wait(self):
+        """
+        等待所有下载完成
+        :return:
+        """
+        wait(self.futures)
 
 class DownloadSession:
     _cancel = False
