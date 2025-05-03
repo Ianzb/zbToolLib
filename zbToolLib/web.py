@@ -174,7 +174,7 @@ class DownloadSession:
             if isDir(path):
                 path = joinPath(path, getFileNameFromUrl(url))
             if isFile(path) and not exist:
-                logging.warning(f"由于文件{path}已存在，自动跳过单线程下载！")
+                logging.warning(f"由于文件{path}已存在，自动跳过多线程下载！")
                 self._result = "skip"
                 return "skip"
             if exist and not force:
