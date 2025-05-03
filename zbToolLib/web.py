@@ -125,6 +125,7 @@ def singleDownload(url: str, path: str, exist: bool = True, force: bool = False,
         logging.info(f"已将文件{url}单线程下载到{path}！")
         return path
     except Exception as ex:
+        deletePath(path)
         logging.error(f"单线程下载文件{url}到{path}失败，报错信息：{ex}！")
         return False
 
@@ -199,6 +200,7 @@ class DownloadSession:
             self._result = "success"
             return path
         except Exception as ex:
+            deletePath(path)
             logging.error(f"多线程下载文件{url}到{path}失败，报错信息：{ex}！")
             self._result = "fail"
             return "fail"
