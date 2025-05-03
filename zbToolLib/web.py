@@ -180,7 +180,7 @@ class DownloadSession:
                 path = addRepeatSuffix(path)
             logging.info(f"正在多线程下载文件{url}到{path}！")
             response = requests.get(url, headers=header, stream=True)
-            total_size = int(response.headers.get('content-length', 0))
+            total_size = int(response.headers.get('content-length', 1024))
             block_size = 1024
             progress = 0
             with open(path, "wb") as file:
