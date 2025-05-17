@@ -1,7 +1,6 @@
 import mimetypes
 import shutil
 
-import magic
 import send2trash
 
 from .system import *
@@ -196,6 +195,7 @@ def getFileSuffix(path: str, from_name: bool = True, has_dot: bool = True):
     :return: 文件后缀名
     """
     if from_name:
+        import magic
         suffix = mimetypes.guess_extension(magic.from_file(path, mime=True), False)
     else:
         suffix = os.path.splitext(os.path.basename(path))[1]

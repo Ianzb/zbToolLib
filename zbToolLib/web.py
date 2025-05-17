@@ -17,6 +17,7 @@ def getWebFileType(url: str, default="", has_dot: bool = True):
     :return: 文件后缀名
     """
     try:
+        import magic
         mime_detector = magic.Magic(mime=True)
         with requests.get(url, stream=True) as response:
             response.raise_for_status()
