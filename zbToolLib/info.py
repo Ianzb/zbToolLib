@@ -1,4 +1,5 @@
-import os, sys
+import os
+import sys
 
 USER_PATH = os.path.expanduser("~")  # 系统用户路径
 REQUEST_HEADER = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36 Edg/130.0.0.0"}  # 程序默认网络请求头

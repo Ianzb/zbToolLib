@@ -1,27 +1,53 @@
+import re
+import traceback
+from concurrent.futures import ThreadPoolExecutor, wait
+
+import requests
+
 from .file import *
 from .info import *
-import logging, requests, re, os, requests
-from concurrent.futures import ThreadPoolExecutor, wait
+
+
+def getWebFileType(url: str, default="", has_dot: bool = True):
+    """
+    获取指定url文件的后缀名
+    :param url: 链接
+    :param default: 默认后缀名（无法判断时返回）
+    :param has_dot: 是否包含后缀名开头的点
+    :return: 文件后缀名
+    """
+    try:
+        mime_detector = magic.Magic(mime=True)
+        with requests.get(url, stream=True) as response:
+            response.raise_for_status()
+            buffer = next(response.iter_content(128)).strip()
+        suffix = mimetypes.guess_extension(mime_detector.from_buffer(buffer), False)
+        if has_dot:
+            return suffix
+        else:
+            return suffix[1:]
+    except:
+        logging.error(f"识别在线文件类型失败，使用默认类型{default}，报错信息：{traceback.format_exc()}！")
+        return default
 
 
 def isUrl(url: str):
     """
     判断是否是网址
-    @param url: 网址字符串
-    @return: 布尔值
+    :param url: 网址字符串
+    :return: 布尔值
     """
-
     return bool(re.compile(r"(https?|ftp|file)://[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]").match(url))
 
 
 def joinUrl(*urls):
     """
     拼接网址
-    @param urls: 网址
-    @return: 拼接结果
+    :param urls: 网址
+    :return: 拼接结果
     """
     from urllib.parse import urljoin
-    data: str = ""
+    data = ""
     for i in urls:
         data = urljoin(data, i)
     return data
@@ -30,26 +56,69 @@ def joinUrl(*urls):
 def splitUrl(url: str):
     """
     分割网址
-    @param url: 网址
-    @return: urlparse对象，使用scheme、netloc、path、params、query、fragment获取片段
+    :param url: 网址
+    :return: urlparse对象，使用scheme、netloc、path、params、query、fragment获取片段
     """
     from urllib.parse import urlparse
     return urlparse(url)
 
 
-def getUrl(url: str, header: dict = REQUEST_HEADER, timeout: int | tuple = (5, 10), times: int = 5):
+def getUrlScheme(url: str):
+    """
+    获取网址的协议
+    :param url: 网址
+    :return: 协议
+    """
+    from urllib.parse import urlparse
+    return urlparse(url).scheme
+
+
+def getUrlNetloc(url: str):
+    """
+    获取网址的主机名
+    :param url: 网址
+    :return: 主机名
+    """
+    from urllib.parse import urlparse
+    return urlparse(url).netloc
+
+
+getUrlHost = getUrlHostname = getUrlDomain = getUrlNetloc
+
+
+def getUrlPath(url: str):
+    """
+    获取网址的路径
+    :param url: 网址
+    :return: 路径
+    """
+    from urllib.parse import urlparse
+    return urlparse(url).path
+
+
+def getUrlParams(url: str):
+    """
+    获取网址的参数
+    :param url: 网址
+    :return: 参数格式如{'keyword': ['abc'], 'id': ['12']}
+    """
+    from urllib.parse import urlparse, parse_qs
+    return parse_qs(urlparse(url).params)
+
+
+def getUrl(url: str, times: int = 5, **kwargs):
     """
     可重试的get请求
-    @param url: 链接
-    @param header: 请求头
-    @param timeout: 超时
-    @param times: 重试次数
-    @return:
+    :param url: 链接
+    :param header: 请求头
+    :param timeout: 超时
+    :param times: 重试次数
+    :return:
     """
     logging.info(f"正在Get请求{url}的信息！")
     for i in range(times):
         try:
-            response = requests.get(url, headers=header, stream=True, timeout=timeout, verify=False)
+            response = requests.get(url, **kwargs, stream=True, verify=False)
             logging.info(f"Get请求{url}成功！")
             return response
         except Exception as ex:
@@ -58,26 +127,17 @@ def getUrl(url: str, header: dict = REQUEST_HEADER, timeout: int | tuple = (5, 1
     logging.error(f"Get请求{url}失败！")
 
 
-def postUrl(url: str, data: dict = None, json: dict = None, header: dict = REQUEST_HEADER, timeout: int | tuple = (5, 10), times: int = 5):
+def postUrl(url: str, times: int = 5, **kwargs):
     """
     可重试的post请求
-    @param url: 链接
-    @param data: 发送表单数据
-    @param json：发送json数据
-    @param header: 请求头
-    @param timeout: 超时
-    @param times: 重试次数
-    @return:
+    :param url: 链接
+    :param times: 重试次数
+    :return:
     """
     logging.info(f"正在Post请求{url}的信息！")
     for i in range(times):
         try:
-            if json:
-                response = requests.post(url, headers=header, json=json, timeout=timeout, verify=False)
-            elif data:
-                response = requests.post(url, headers=header, data=data, timeout=timeout, verify=False)
-            else:
-                raise ValueError("data和json不能同时为空！")
+            response = requests.post(url, **kwargs, verify=False)
             logging.info(f"Post请求{url}成功！")
             return response
         except Exception as ex:
@@ -89,8 +149,8 @@ def postUrl(url: str, data: dict = None, json: dict = None, header: dict = REQUE
 def getFileNameFromUrl(url: str):
     """
     从链接获取文件名
-    @param url: 链接
-    @return:
+    :param url: 链接
+    :return:
     """
     return os.path.basename(splitUrl(url).path)
 
@@ -98,24 +158,22 @@ def getFileNameFromUrl(url: str):
 def singleDownload(url: str, path: str, exist: bool = True, force: bool = False, header: dict = REQUEST_HEADER):
     """
     下载文件
-    @param url: 下载链接
-    @param path: 下载后完整目录/文件名
-    @param exist: 是否在已有文件的情况下下载（False时force无效）
-    @param force: 是否强制下载（替换已有文件）
-    @param header: 请求头
-    @return:
+    :param url: 下载链接
+    :param path: 下载后完整目录/文件名
+    :param exist: 是否在已有文件的情况下下载（False时force无效）
+    :param force: 是否强制下载（替换已有文件）
+    :param header: 请求头
+    :return:
     """
-    import requests
-    if not existPath(path):
-        createDir(splitPath(path, 3))
     try:
         if isDir(path):
             path = joinPath(path, getFileNameFromUrl(url))
         if isFile(path) and not exist:
             logging.warning(f"由于文件{path}已存在，自动跳过单线程下载！")
             return False
+        createDir(getFileDir(path))
         if exist and not force:
-            path = addRepeatSuffix(path)
+            path = getRepeatFileName(path)
         logging.info(f"正在单线程下载文件{url}到{path}！")
         response = requests.get(url, headers=header, stream=True)
         with open(path, "wb") as f:
@@ -132,7 +190,8 @@ def singleDownload(url: str, path: str, exist: bool = True, force: bool = False,
 
 class DownloadManager:
     downloadThreadPool = ThreadPoolExecutor(max_workers=32)
-    futures=[]
+    futures = []
+
     def setMaxThread(self, num: int):
         if num <= 0:
             logging.error(f"设置多线程下载线程数{num}无效！")
@@ -143,23 +202,25 @@ class DownloadManager:
     def download(self, url: str, path: str, exist: bool = True, force: bool = False, header: dict = REQUEST_HEADER):
         """
         下载文件
-        @param url: 下载链接
-        @param path: 下载后完整目录/文件名
-        @param exist: 是否在已有文件的情况下下载（False时force无效）
-        @param force: 是否强制下载（替换已有文件）
-        @param header: 请求头
-        @return: 下载对象
+        :param url: 下载链接
+        :param path: 下载后完整目录/文件名
+        :param exist: 是否在已有文件的情况下下载（False时force无效）
+        :param force: 是否强制下载（替换已有文件）
+        :param header: 请求头
+        :return: 下载对象
         """
         d = DownloadSession()
         d.download(url, path, self, exist, force, header)
         self.futures.append(d.session)
         return d
+
     def wait(self):
         """
         等待所有下载完成
         :return:
         """
         wait(self.futures)
+
 
 class DownloadSession:
     _cancel = False
@@ -168,8 +229,6 @@ class DownloadSession:
     session = None
 
     def _download(self, url: str, path: str, exist: bool = True, force: bool = False, header: dict = REQUEST_HEADER):
-        if not existPath(path):
-            createDir(splitPath(path, 3))
         try:
             if isDir(path):
                 path = joinPath(path, getFileNameFromUrl(url))
@@ -177,8 +236,9 @@ class DownloadSession:
                 logging.warning(f"由于文件{path}已存在，自动跳过多线程下载！")
                 self._result = "skip"
                 return "skip"
+            createDir(getFileDir(path))
             if exist and not force:
-                path = addRepeatSuffix(path)
+                path = getRepeatFileName(path)
             logging.info(f"正在多线程下载文件{url}到{path}！")
             response = requests.get(url, headers=header, stream=True)
             total_size = int(response.headers.get('content-length', 1024))
