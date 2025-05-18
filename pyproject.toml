@@ -1,6 +1,6 @@
 [project]
 name = "zbToolLib"
-version = "2.0.0b2"
+version = "2.0.0b3"
 description = "zb工具库"
 requires-python = ">=3.12"
 dependencies = [
@@ -8,8 +8,6 @@ dependencies = [
     "requests>=2.32.3",
     "winshell>=0.6; sys_platform == 'win32'",
     "pywin32>=310; sys_platform == 'win32'",
-    "python-magic>=0.4.27",
-    "python-magic-bin>=0.4.14",
 ]
 authors = [
     { name = "Ianzb", email = "93322252@qq.com" },
