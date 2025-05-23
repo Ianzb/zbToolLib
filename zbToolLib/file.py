@@ -195,10 +195,10 @@ def getFileSuffix(path: str, from_name: bool = True, has_dot: bool = True):
     :return: 文件后缀名
     """
     if from_name:
+        suffix = os.path.splitext(os.path.basename(path))[1]
+    else:
         import magic
         suffix = mimetypes.guess_extension(magic.from_file(path, mime=True), False)
-    else:
-        suffix = os.path.splitext(os.path.basename(path))[1]
     if has_dot:
         return suffix
     else:
@@ -251,6 +251,7 @@ def fileSize(path: str):
     else:
         logging.warning(f"未知路径{path}，无法计算大小。")
         return 0
+
 
 def dirSize(path: str):
     """
