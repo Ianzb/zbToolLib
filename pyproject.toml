@@ -1,6 +1,6 @@
 [project]
 name = "zbToolLib"
-version = "2.0.0b4"
+version = "2.0.0"
 description = "zb工具库"
 requires-python = ">=3.12"
 dependencies = [

@@ -491,7 +491,7 @@ def showFile(path: str):
     :param path: 路径
     """
     if isFile(path):
-        easyCmd(f'explorer /select,"{path}"')
+        easyCmd(f'explorer /select,"{path.replace("/","\\")}"')
     elif isDir(path):
         os.startfile(path)
 
