@@ -8,7 +8,7 @@ def clearEscapeCharaters(text: str):
     :return: 清理后的字符串
     """
     from re import sub
-    sub(r"[\n\v\r\t]", "", text)
+    return sub(r"[\n\v\r\t]", "", text)
 
 
 def clearIllegalPathName(text: str):
