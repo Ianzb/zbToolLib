@@ -25,4 +25,4 @@ zb工具库（zbToolLib）是一个Python工具库，提供了文件处理、网
 2025-05-17：2.0.0b3：新增并重命名多个函数。  
 2025-05-23：2.0.0b4：修改magic库逻辑。  
 2025-06-01：2.0.0：修复showFile斜杠处理缺失的Bug。  
-2025-06-07：2.0.1：修复clearEscapeCharaters无返回值的Bug。  
+2025-06-07：2.0.1.1：修复clearEscapeCharaters无返回值的Bug，修复fileSize错误的问题。

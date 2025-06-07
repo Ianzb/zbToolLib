@@ -246,11 +246,11 @@ def fileSize(path: str):
     :param path: 文件路径
     :return: 文件大小
     """
-    if isDir(path):
-        return sum([fileSize(joinPath(path, file)) for file in walkFile(path)])
+    if isFile(path):
+        return os.path.getsize(path)
     else:
         logging.warning(f"未知路径{path}，无法计算大小。")
-        return 0
+        return False
 
 
 def dirSize(path: str):
@@ -263,7 +263,7 @@ def dirSize(path: str):
         return sum([fileSize(joinPath(path, file)) for file in walkFile(path)])
     else:
         logging.warning(f"未知路径{path}，无法计算大小。")
-        return 0
+        return False
 
 
 def pathSize(path: str):
@@ -278,7 +278,7 @@ def pathSize(path: str):
         return dirSize(path)
     else:
         logging.warning(f"未知路径{path}，无法计算大小。")
-        return 0
+        return False
 
 
 size = pathSize
