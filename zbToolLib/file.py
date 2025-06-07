@@ -439,7 +439,7 @@ def copyPath(old: str, new: str, replace: bool = False):
         new = getRepeatFileName(new)
     if isFile(old):
         try:
-            createDir(getFileDir(old))
+            createDir(getFileDir(new))
             shutil.copy2(old, new)
         except Exception as ex:
             logging.error(f"复制文件失败，错误信息：{ex}。")
