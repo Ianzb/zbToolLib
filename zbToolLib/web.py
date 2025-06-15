@@ -19,7 +19,7 @@ def getWebFileType(url: str, default="", has_dot: bool = True):
     try:
         import magic
         mime_detector = magic.Magic(mime=True)
-        with requests.get(url, stream=True) as response:
+        with requests.get(url, stream=True, verify=False) as response:
             response.raise_for_status()
             buffer = next(response.iter_content(128)).strip()
         suffix = mimetypes.guess_extension(mime_detector.from_buffer(buffer), False)
@@ -176,7 +176,7 @@ def singleDownload(url: str, path: str, exist: bool = True, force: bool = False,
         if exist and not force:
             path = getRepeatFileName(path)
         logging.info(f"正在单线程下载文件{url}到{path}！")
-        response = requests.get(url, headers=header, stream=True)
+        response = requests.get(url, headers=header, stream=True, verify=False)
         with open(path, "wb") as f:
             for chunk in response.iter_content(chunk_size=1024):
                 if chunk:
@@ -241,7 +241,7 @@ class DownloadSession:
             if exist and not force:
                 path = getRepeatFileName(path)
             logging.info(f"正在多线程下载文件{url}到{path}！")
-            response = requests.get(url, headers=header, stream=True)
+            response = requests.get(url, headers=header, stream=True, verify=False)
             total_size = int(response.headers.get('content-length', 1024))
             block_size = 1024
             progress = 0
