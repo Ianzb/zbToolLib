@@ -1,5 +1,6 @@
 import mimetypes
 import shutil
+import traceback
 
 import send2trash
 
@@ -186,23 +187,28 @@ def getFileName(path: str, has_suffix: bool = True):
         return os.path.splitext(os.path.basename(path))[0]
 
 
-def getFileSuffix(path: str, from_name: bool = True, has_dot: bool = True):
+def getFileSuffix(path: str, from_name: bool = True, default="", has_dot: bool = True):
     """
     获取文件后缀名
     :param path: 文件路径
-    :param from_name: 是否从文件名称获取后缀名，关闭后将根据文件数据类型判断后缀名
+    :param from_name: 是否从文件名称获取后缀名
     :param has_dot: 是否包含后缀名开头的点
     :return: 文件后缀名
     """
     if from_name:
         suffix = os.path.splitext(os.path.basename(path))[1]
     else:
-        import magic
-        suffix = mimetypes.guess_extension(magic.from_file(path, mime=True), False)
-    if has_dot:
-        return suffix
-    else:
-        return suffix[1:]
+        try:
+            import puremagic
+            with open(path, "rb") as f:
+                ext = puremagic.from_string(f.read(1024))
+                suffix = ext if ext else default
+        except Exception:
+            suffix = default
+            logging.error(f"识别本地文件{path}类型失败，使用默认类型{default}，报错信息：{traceback.format_exc()}！")
+    if not has_dot:
+        suffix = suffix.lstrip(".")
+    return suffix
 
 
 getSuffix = getFileSuffix
@@ -491,7 +497,7 @@ def showFile(path: str):
     :param path: 路径
     """
     if isFile(path):
-        easyCmd(f'explorer /select,"{path.replace("/","\\")}"')
+        easyCmd(f'explorer /select,"{path.replace("/", "\\")}"')
     elif isDir(path):
         os.startfile(path)
 

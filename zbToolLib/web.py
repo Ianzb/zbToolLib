@@ -17,19 +17,19 @@ def getWebFileType(url: str, default="", has_dot: bool = True):
     :return: 文件后缀名
     """
     try:
-        import magic
-        mime_detector = magic.Magic(mime=True)
+        import puremagic
         with requests.get(url, stream=True, verify=False) as response:
             response.raise_for_status()
-            buffer = next(response.iter_content(128)).strip()
-        suffix = mimetypes.guess_extension(mime_detector.from_buffer(buffer), False)
-        if has_dot:
-            return suffix
-        else:
-            return suffix[1:]
-    except:
-        logging.error(f"识别在线文件类型失败，使用默认类型{default}，报错信息：{traceback.format_exc()}！")
-        return default
+            buffer = next(response.iter_content(1024)).strip()
+        ext = puremagic.from_string(buffer)
+        suffix = ext if ext else default
+        return suffix
+    except Exception:
+        logging.error(f"识别在线文件{url}类型失败，使用默认类型{default}，报错信息：{traceback.format_exc()}！")
+        suffix = default
+    if not has_dot:
+        suffix = suffix.lstrip(".")
+    return suffix
 
 
 def isUrl(url: str):
