@@ -73,3 +73,17 @@ def numberAddUnit(value: int):
             return f"{value:.{i}f}{units[i]}"
         value = value / size
     return f"{value:.3f}兆"
+
+
+def getInfo(data, key, default="无"):
+    """
+    从data字典获取key项的值，若不存在或为空则返回default值
+    :param data: 字典
+    :param key: 键名
+    :param default: 默认值
+    :return:
+    """
+    if key in data.keys() and data[key] != "" and data[key] is not None:
+        return data[key]
+    else:
+        return default
