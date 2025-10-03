@@ -224,10 +224,12 @@ class DownloadManager:
 
 
 class DownloadSession:
-    _cancel = False
-    _progress = 0
-    _result = None
-    session = None
+    def __init__(self):
+        self._cancel = False
+        self._pause = False
+        self._progress = 0
+        self._result = None
+        self.session = None
 
     def _download(self, url: str, path: str, exist: bool = True, force: bool = False, header: dict = REQUEST_HEADER):
         try:
@@ -235,36 +237,39 @@ class DownloadSession:
                 path = joinPath(path, getFileNameFromUrl(url))
             if isFile(path) and not exist:
                 logging.warning(f"由于文件{path}已存在，自动跳过多线程下载！")
-                self._result = "skip"
-                return "skip"
+                self._result = "skipped"
+                return "skipped"
             createDir(getFileDir(path))
             if exist and not force:
                 path = getRepeatFileName(path)
             logging.info(f"正在多线程下载文件{url}到{path}！")
             response = requests.get(url, headers=header, stream=True, verify=False)
-            total_size = int(response.headers.get('content-length', 1024))
+            total_size = int(response.headers.get("content-length", 1024))
             block_size = 1024
             progress = 0
             with open(path, "wb") as file:
                 for chunk in response.iter_content(chunk_size=block_size):
+                    while self._pause:
+                        import time
+                        time.sleep(0.1)
                     if self._cancel:
                         logging.info(f"下载文件{url}到{path}被取消！")
-                        self._result = "cancel"
+                        self._result = "cancelled"
                         file.close()
                         deleteFile(path)
-                        return "cancel"
+                        return "cancelled"
                     if chunk:
                         file.write(chunk)
                         progress += len(chunk)
                         self._progress = progress / total_size * 100
             logging.info(f"已将文件{url}多线程下载到{path}！")
-            self._result = "success"
+            self._result = "finished"
             return path
         except Exception as ex:
             deletePath(path)
             logging.error(f"多线程下载文件{url}到{path}失败，报错信息：{ex}！")
-            self._result = "fail"
-            return "fail"
+            self._result = "failed"
+            return "failed"
 
     def download(self, url: str, path: str, manager: DownloadManager = None, exist: bool = True, force: bool = False, header: dict = REQUEST_HEADER):
         self.session = manager.downloadThreadPool.submit(self._download, url, path, exist, force, header)
@@ -274,6 +279,18 @@ class DownloadSession:
         取消下载
         """
         self._cancel = True
+
+    def pause(self):
+        """
+        暂停下载
+        """
+        self._pause = True
+
+    def resume(self):
+        """
+        继续下载
+        """
+        self._pause = False
 
     def progress(self):
         """
@@ -287,21 +304,18 @@ class DownloadSession:
         任务完成状态
         :return: 是否完成
         """
-        if self._result is not None:
-            return True
-        else:
-            return False
+        return self._result is not None
 
     def result(self):
         """
         任务结果
-        :return: skip,cancel,success,fail
+        :return: skipped, cancelled, finished, failed
         """
         return self._result
 
     def outputPath(self):
         try:
-            if self._result == "success":
+            if self._result == "finished":
                 return self.session.result(0.1)
         except TimeoutError:
             return None
