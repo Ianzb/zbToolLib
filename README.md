@@ -30,3 +30,4 @@ zb工具库（zbToolLib）是一个Python工具库，提供了文件处理、网
 2025-06-16：2.0.3：重写Magic相关模块，迁移至puramagic库。  
 2025-08-30：2.0.4：新增getInfo。  
 2025-10-03：2.0.5：DownloadSession支持暂停。  
+2025-10-04：2.0.6：DownloadSession完善状态码。  

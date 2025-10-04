@@ -228,17 +228,18 @@ class DownloadSession:
         self._cancel = False
         self._pause = False
         self._progress = 0
-        self._result = None
+        self._stat = None
         self.session = None
 
     def _download(self, url: str, path: str, exist: bool = True, force: bool = False, header: dict = REQUEST_HEADER):
         try:
+            self._stat = "downloading"
             if isDir(path):
                 path = joinPath(path, getFileNameFromUrl(url))
             if isFile(path) and not exist:
                 logging.warning(f"由于文件{path}已存在，自动跳过多线程下载！")
-                self._result = "skipped"
-                return "skipped"
+                self._stat = "cancelled"
+                return "cancelled"
             createDir(getFileDir(path))
             if exist and not force:
                 path = getRepeatFileName(path)
@@ -254,7 +255,6 @@ class DownloadSession:
                         time.sleep(0.1)
                     if self._cancel:
                         logging.info(f"下载文件{url}到{path}被取消！")
-                        self._result = "cancelled"
                         file.close()
                         deleteFile(path)
                         return "cancelled"
@@ -263,12 +263,12 @@ class DownloadSession:
                         progress += len(chunk)
                         self._progress = progress / total_size * 100
             logging.info(f"已将文件{url}多线程下载到{path}！")
-            self._result = "finished"
+            self._stat = "success"
             return path
         except Exception as ex:
             deletePath(path)
             logging.error(f"多线程下载文件{url}到{path}失败，报错信息：{ex}！")
-            self._result = "failed"
+            self._stat = "failed"
             return "failed"
 
     def download(self, url: str, path: str, manager: DownloadManager = None, exist: bool = True, force: bool = False, header: dict = REQUEST_HEADER):
@@ -278,19 +278,25 @@ class DownloadSession:
         """
         取消下载
         """
-        self._cancel = True
+        if not self._stat in ["cancelled", "success", "failed"]:
+            self._cancel = True
+            self._stat = "cancelled"
 
     def pause(self):
         """
         暂停下载
         """
-        self._pause = True
+        if not self._stat in ["cancelled", "success", "failed"]:
+            self._pause = True
+            self._stat = "paused"
 
     def resume(self):
         """
         继续下载
         """
-        self._pause = False
+        if self._pause and self.getStat == "paused":
+            self._pause = False
+            self._stat = "downloading"
 
     def progress(self):
         """
@@ -304,21 +310,38 @@ class DownloadSession:
         任务完成状态
         :return: 是否完成
         """
-        return self._result is not None
+        return self._stat not in ["downloading", "paused"]
 
-    def result(self):
+    def getStat(self):
         """
         任务结果
-        :return: skipped, cancelled, finished, failed
+        :return: downloading, paused, cancelled, success, failed,
         """
-        return self._result
+        return self._stat
+
+    def stat(self):
+        """
+        任务结果
+        :return: downloading, paused, cancelled, success, failed,
+        """
+        return self.getStat()
 
     def outputPath(self):
+        """
+        输出路径
+        :return:
+        """
         try:
-            if self._result == "finished":
-                return self.session.result(0.1)
+            if self._stat == "success":
+                path = self.session.result(0.1)
+                return path if path else ""
         except TimeoutError:
-            return None
-
+            return ""
+    def path(self):
+        """
+        输出路径
+        :return:
+        """
+        return self.outputPath()
 
 downloadManager = DownloadManager()
