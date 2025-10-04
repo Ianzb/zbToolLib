@@ -294,7 +294,7 @@ class DownloadSession:
         """
         继续下载
         """
-        if self._pause and self.getStat == "paused":
+        if self._pause and self._stat == "paused":
             self._pause = False
             self._stat = "downloading"
 
@@ -337,11 +337,13 @@ class DownloadSession:
                 return path if path else ""
         except TimeoutError:
             return ""
+
     def path(self):
         """
         输出路径
         :return:
         """
         return self.outputPath()
+
 
 downloadManager = DownloadManager()
