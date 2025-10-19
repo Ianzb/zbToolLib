@@ -21,7 +21,7 @@ license = { text = "MIT License" }
 keywords = ["zb", "Ianzb", "tool", "lib"]
 classifiers = [
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Operating System :: Microsoft :: Windows",
