@@ -18,6 +18,7 @@ else:
 
 if SYSTEM_TYPE == "Windows":
     from winreg import QueryValueEx, OpenKey, HKEY_CURRENT_USER
+    import ctypes
 
 
     def DESKTOP_PATH():
@@ -26,3 +27,14 @@ if SYSTEM_TYPE == "Windows":
 
     def DOWNLOAD_PATH():
         return QueryValueEx(OpenKey(HKEY_CURRENT_USER, r"Software\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders"), "{374DE290-123F-4565-9164-39C4925E467B}")[0]
+
+
+    try:
+        # 设置错误模式
+        SEM_FAILCRITICALERRORS = 0x0001
+        SEM_NOGPFAULTERRORBOX = 0x0002
+        ctypes.windll.kernel32.SetErrorMode(
+            SEM_FAILCRITICALERRORS | SEM_NOGPFAULTERRORBOX
+        )
+    except:
+        pass
