@@ -1,9 +1,6 @@
 name: Upload Python Package
 
 on:
-  push:
-    tags:
-      - "v*"  # match tags starting with v
 
 permissions:
   contents: write
@@ -88,7 +85,7 @@ jobs:
       id-token: write
 
     environment: release
-    
+
     steps:
       - name: Download release distributions
         uses: actions/download-artifact@v4
