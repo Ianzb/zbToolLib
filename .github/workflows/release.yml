@@ -55,13 +55,16 @@ jobs:
           proj = data.get('project', {})
           pkg = proj.get('name', 'PACKAGE_NAME_PLACEHOLDER')
           ver = proj.get('version', '')
-          # Emit outputs in GITHUB_OUTPUT format
-          print(f"package={pkg}")
-          print(f"version={ver}")
+          # write outputs to a file so we can append to GITHUB_OUTPUT
+          with open('meta.txt', 'w', encoding='utf-8') as f:
+              f.write(f"package={pkg}\nversion={ver}\n")
           PY
+          # append to GITHUB_OUTPUT so the step outputs are available
+          cat meta.txt >> $GITHUB_OUTPUT
         shell: bash
 
       - name: Verify built version
+        shell: bash
         run: |
           ls -l dist || (echo "No dist directory found" && exit 1)
           if [ -z "${{ steps.meta.outputs.version }}" ]; then
