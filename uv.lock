@@ -156,7 +156,7 @@ sdist = { url = "https://files.pythonhosted.org/packages/91/3f/d23d248029a49042d
 
 [[package]]
 name = "zbtoollib"
-version = "2.0.8.1"
+version = "2.0.9b1"
 source = { editable = "." }
 dependencies = [
     { name = "puremagic" },
