@@ -1,4 +1,4 @@
-name: 上传 Python 包
+name: CI Build
 
 on:
   workflow_dispatch:
