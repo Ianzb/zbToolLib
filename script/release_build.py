@@ -2,7 +2,13 @@
 # -*- coding: utf-8 -*-
 from config import *
 
+import json
 import argparse
+
+
+def write_text(path: str, content: str):
+    with open(path, "w", encoding="utf-8") as file:
+        file.write(content)
 
 
 def replace_pyproject_toml(version: str):
@@ -28,3 +34,4 @@ if __name__ == "__main__":
 
     out_path = os.path.join(ROOT, "script", "release_output.json")
     print("打包结果：", out)
+    write_text(out_path, json.dumps(out, ensure_ascii=False, indent=4))
