@@ -1,46 +1,33 @@
 [project]
 name = "zbToolLib"
-version = "2.0.8.1"
+version = "2.0.9b1"
 description = "zb工具库"
 requires-python = ">=3.12"
-dependencies = [
-    "send2trash==2.1.0",
-    "requests==2.34.2",
-    "winshell>=0.6; sys_platform == 'win32'",
-    "pywin32>=311; sys_platform == 'win32'",
-    "puremagic==2.2.0",
-]
-
-authors = [
-    { name = "Ianzb", email = "93322252@qq.com" },
-]
-maintainers = [
-    { name = "Ianzb", email = "93322252@qq.com" },
-]
+dependencies = [ "send2trash==2.1.0", "requests==2.34.2", "winshell>=0.6; sys_platform == 'win32'", "pywin32>=311; sys_platform == 'win32'", "puremagic==2.2.0",]
 readme = "README.md"
-license = { text = "MIT License" }
-keywords = ["zb", "Ianzb", "tool", "lib"]
-classifiers = [
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.13",
-    "License :: OSI Approved :: MIT License",
-    "Operating System :: OS Independent",
-    "Operating System :: Microsoft :: Windows",
-    "Operating System :: MacOS :: MacOS X",
-    "Operating System :: POSIX :: Linux",
-]
-[tool.setuptools.packages.find]
-where = ["."]
-exclude = ["script*"]
+keywords = [ "zb", "Ianzb", "tool", "lib",]
+classifiers = [ "Programming Language :: Python :: 3", "Programming Language :: Python :: 3.13", "License :: OSI Approved :: MIT License", "Operating System :: OS Independent", "Operating System :: Microsoft :: Windows", "Operating System :: MacOS :: MacOS X", "Operating System :: POSIX :: Linux",]
+[[project.authors]]
+name = "Ianzb"
+email = "93322252@qq.com"
+
+[[project.maintainers]]
+name = "Ianzb"
+email = "93322252@qq.com"
 
 [build-system]
-requires = ["setuptools"]
+requires = [ "setuptools",]
 build-backend = "setuptools.build_meta"
 
 [dependency-groups]
-dev = [
-    "toml>=0.10.2",
-]
+dev = [ "toml>=0.10.2",]
+
+[project.license]
+text = "MIT License"
 
 [project.urls]
 Repository = "https://github.com/Ianzb/zbToolLib/"
+
+[tool.setuptools.packages.find]
+where = [ ".",]
+exclude = [ "script*",]
