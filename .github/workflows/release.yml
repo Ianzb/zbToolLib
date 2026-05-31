@@ -32,7 +32,7 @@ jobs:
         uses: astral-sh/setup-uv@v8.1.0
 
       - name: 安装项目
-        run: uv sync --locked --all-extras --dev
+        run: uv sync --all-extras --dev
 
       - name: 更新版本号
         shell: pwsh
