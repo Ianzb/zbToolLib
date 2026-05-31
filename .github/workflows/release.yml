@@ -88,3 +88,26 @@ jobs:
           } else {
             Write-Host "无版本变更"
           }
+
+  pypi-publish:
+    name: 发布到 PyPI
+    runs-on: ubuntu-latest
+    needs: build
+    permissions:
+      id-token: write
+
+    environment: release
+
+    steps:
+      - name: 下载构建产物
+        uses: actions/download-artifact@v8
+        with:
+          name: ${{ env.PROGRAM_NAME }}_${{ steps.check_output.outputs.version }}.zip
+          path: dist/
+
+      - name: 发布到 PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: dist/
+          skip-existing: false
+          verbose: true
