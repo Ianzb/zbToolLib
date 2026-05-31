@@ -5,6 +5,8 @@ from config import *
 import json
 import argparse
 
+sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 
 def write_text(path: str, content: str):
     with open(path, "w", encoding="utf-8") as file:
