@@ -64,13 +64,6 @@ jobs:
           name: ${{ env.PROGRAM_NAME }}_${{ steps.check_output.outputs.version }}.zip
           path: dist/
 
-      - name: 发布到 PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          packages-dir: dist/
-          skip-existing: false
-          verbose: true
-
       - name: 提交版本更新
         shell: pwsh
         run: |
