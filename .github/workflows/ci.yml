@@ -60,7 +60,6 @@ jobs:
           Write-Host "CI Version: $ci"
 
       - name: 修改版本号
-        id: get_version
         shell: pwsh
         run: |
           uv run script\release_build.py -v "${{ steps.generate_ci_version.outputs.ci_version }}"
