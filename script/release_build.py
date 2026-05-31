@@ -8,9 +8,16 @@ import argparse
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 
+
 def write_text(path: str, content: str):
     with open(path, "w", encoding="utf-8") as file:
         file.write(content)
+
+
+def get_current_version():
+    import toml
+    data = toml.load(PYPROJECT_TOML)
+    return data["project"]["version"]
 
 
 def replace_pyproject_toml(version: str):
@@ -27,6 +34,10 @@ if __name__ == "__main__":
     parser.add_argument("-v", "--version", required=False, help="版本号")
     args = parser.parse_args()
     version = args.version
+
+    current_version = get_current_version()
+    if not version:
+        version = current_version
 
     replace_pyproject_toml(version)
 
