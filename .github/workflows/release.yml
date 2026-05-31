@@ -95,7 +95,7 @@ jobs:
       - name: 下载构建产物
         uses: actions/download-artifact@v8
         with:
-          name: ${{ env.PROGRAM_NAME }}_${{ steps.check_output.outputs.version }}.zip
+          name: ${{ env.PROGRAM_NAME }}_${{ jobs.build.steps.check_output.outputs.version }}.zip
           path: dist/
 
       - name: 发布到 PyPI
