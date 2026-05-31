@@ -16,8 +16,7 @@ permissions:
   id-token: write
 
 jobs:
-  release-build:
-    name: 构建发行包
+  build:
     runs-on: windows-latest
     outputs:
       package: ${{ steps.meta.outputs.package }}
