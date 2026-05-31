@@ -4,12 +4,13 @@ version = "2.0.8.1"
 description = "zb工具库"
 requires-python = ">=3.12"
 dependencies = [
-    "send2trash>=2.1.0",
-    "requests>=2.32.5",
+    "send2trash==2.1.0",
+    "requests==2.34.2",
     "winshell>=0.6; sys_platform == 'win32'",
     "pywin32>=311; sys_platform == 'win32'",
-    "puremagic>=2.0.0",
+    "puremagic==2.2.0",
 ]
+
 authors = [
     { name = "Ianzb", email = "93322252@qq.com" },
 ]
@@ -28,10 +29,18 @@ classifiers = [
     "Operating System :: MacOS :: MacOS X",
     "Operating System :: POSIX :: Linux",
 ]
+[tool.setuptools.packages.find]
+where = ["."]
+exclude = ["script*"]
 
 [build-system]
 requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
+
+[dependency-groups]
+dev = [
+    "toml>=0.10.2",
+]
 
 [project.urls]
 Repository = "https://github.com/Ianzb/zbToolLib/"

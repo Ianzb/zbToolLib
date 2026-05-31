@@ -1,0 +1,23 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+from config import *
+
+import argparse
+
+
+def replace_pyproject_toml(version: str):
+    import toml
+    data = toml.load(PYPROJECT_TOML)
+    data["project"]["version"] = version
+    with open(PYPROJECT_TOML, "w", encoding="utf-8") as file:
+        toml.dump(data, file)
+    print("已修改pyproject.toml版本号！")
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-v", "--version", required=False, help="版本号")
+    args = parser.parse_args()
+    version = args.version
+
+    replace_pyproject_toml(version)

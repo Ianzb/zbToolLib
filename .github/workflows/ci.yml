@@ -2,11 +2,14 @@ name: 上传 Python 包
 
 on:
   workflow_dispatch:
-    inputs:
-      version:
-        description: "版本号"
-        required: false
-        default: ""
+  push:
+    branches: [ main ]
+    paths:
+      - "zbToolLib/**"
+  pull_request:
+    branches: [ main ]
+    paths:
+      - "zbToolLib/**"
 
 permissions:
   contents: write
@@ -35,18 +38,6 @@ jobs:
       - name: 安装项目
         run: uv sync --no-group dev
 
-      - name: 更新版本号
-        shell: pwsh
-        run: |
-          $inputVersion = "${{ github.event.inputs.version }}"
-          if ([string]::IsNullOrEmpty($inputVersion)) {
-            Write-Host "未指定版本号，使用当前版本号"
-            uv run script\release_build.py
-          } else {
-            Write-Host "使用指定版本号: $inputVersion"
-            uv run script\release_build.py -v "$inputVersion"
-          }
-
       - name: 构建分发包
         run: |
           uv build --no-sources
@@ -56,10 +47,3 @@ jobs:
         with:
           name: release-dists
           path: dist/
-
-      - name: 发布到 PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          packages-dir: dist/
-          skip-existing: false
-          verbose: true
