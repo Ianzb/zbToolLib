@@ -1,5 +1,8 @@
 name: CI Build
 
+env:
+  PROGRAM_NAME: "zbToolLib"
+
 on:
   workflow_dispatch:
   push:
@@ -36,7 +39,31 @@ jobs:
         uses: astral-sh/setup-uv@v8.1.0
 
       - name: 安装项目
-        run: uv sync --no-group dev
+        run: uv sync --locked --all-extras --dev
+
+      - name: 获取版本号
+        id: get_version
+        shell: pwsh
+        run: |
+          uv run script\release_build.py
+          $out = Get-Content -Raw script\release_output.json | ConvertFrom-Json
+          $version = $out.version
+          Write-Output "version=$version" >> $env:GITHUB_OUTPUT
+
+      - name: 生成 CI 版本号
+        id: generate_ci_version
+        shell: pwsh
+        run: |
+          $base = "${{ steps.get_version.outputs.version }}"
+          $ci   = "$base+ci$env:GITHUB_RUN_NUMBER"
+          Write-Output "ci_version=$ci" >> $env:GITHUB_OUTPUT
+          Write-Host "CI Version: $ci"
+
+      - name: 修改版本号
+        id: get_version
+        shell: pwsh
+        run: |
+          uv run script\release_build.py -v "${{ steps.generate_ci_version.outputs.ci_version }}"
 
       - name: 构建分发包
         run: |
@@ -45,5 +72,5 @@ jobs:
       - name: 上传构建产物
         uses: actions/upload-artifact@v7
         with:
-          name: release-dists
+          name: ${{ env.PROGRAM_NAME }}.zip
           path: dist/

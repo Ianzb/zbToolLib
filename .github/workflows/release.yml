@@ -1,5 +1,8 @@
 name: Release Build
 
+env:
+  PROGRAM_NAME: "zbToolLib"
+
 on:
   workflow_dispatch:
     inputs:
@@ -33,7 +36,7 @@ jobs:
         uses: astral-sh/setup-uv@v8.1.0
 
       - name: 安装项目
-        run: uv sync --no-group dev
+        run: uv sync --locked --all-extras --dev
 
       - name: 更新版本号
         shell: pwsh
@@ -47,6 +50,14 @@ jobs:
             uv run script\release_build.py -v "$inputVersion"
           }
 
+      - name: 校验构建输出
+        id: check_output
+        shell: pwsh
+        run: |
+          $out = Get-Content -Raw script\release_output.json | ConvertFrom-Json
+          $version = $out.version
+          Write-Output "version=$version" >> $env:GITHUB_OUTPUT
+
       - name: 构建分发包
         run: |
           uv build --no-sources
@@ -54,7 +65,7 @@ jobs:
       - name: 上传构建产物
         uses: actions/upload-artifact@v7
         with:
-          name: release-dists
+          name: ${{ env.PROGRAM_NAME }}_${{ steps.check_output.outputs.version }}.zip
           path: dist/
 
       - name: 发布到 PyPI
@@ -63,3 +74,21 @@ jobs:
           packages-dir: dist/
           skip-existing: false
           verbose: true
+
+      - name: 提交版本更新
+        shell: pwsh
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add -u
+          if (-not (git diff --cached --quiet)) {
+            git stash
+            git pull --rebase origin main
+            git stash pop
+            git add -u
+            git commit -m "Update version to ${{ steps.check_output.outputs.version }} [ci skip]"
+            git push origin main
+          } else {
+            Write-Host "无版本变更"
+          }

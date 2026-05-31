@@ -21,3 +21,10 @@ if __name__ == "__main__":
     version = args.version
 
     replace_pyproject_toml(version)
+
+    out = {
+        "version": version,
+    }
+
+    out_path = os.path.join(ROOT, "script", "release_output.json")
+    print("打包结果：", out)
