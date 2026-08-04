@@ -10,6 +10,8 @@ from .info import *
 _session = requests.Session()
 _session.verify = False
 _session.headers.update(REQUEST_HEADER)
+_session.mount("http://", requests.adapters.HTTPAdapter(pool_connections=100, pool_maxsize=100))
+_session.mount("https://", requests.adapters.HTTPAdapter(pool_connections=100, pool_maxsize=100))
 
 
 def getWebFileType(url: str, default="", has_dot: bool = True):
