@@ -7,6 +7,10 @@ import requests
 from .file import *
 from .info import *
 
+_session = requests.Session()
+_session.verify = False
+_session.headers.update(REQUEST_HEADER)
+
 
 def getWebFileType(url: str, default="", has_dot: bool = True):
     """
@@ -18,7 +22,7 @@ def getWebFileType(url: str, default="", has_dot: bool = True):
     """
     try:
         import puremagic
-        with requests.get(url, stream=True, verify=False) as response:
+        with _session.get(url, stream=True, verify=False) as response:
             response.raise_for_status()
             buffer = next(response.iter_content(1024)).strip()
         ext = puremagic.from_string(buffer)
@@ -119,7 +123,7 @@ def getUrl(url: str, times: int = 5, **kwargs):
     logging.info(f"正在Get请求{url}的信息！")
     for i in range(times):
         try:
-            response = requests.get(url, **kwargs, stream=True, verify=False)
+            response = _session.get(url, **kwargs, stream=True, verify=False)
             logging.info(f"Get请求{url}成功！")
             return response
         except Exception as ex:
@@ -138,7 +142,7 @@ def postUrl(url: str, times: int = 5, **kwargs):
     logging.info(f"正在Post请求{url}的信息！")
     for i in range(times):
         try:
-            response = requests.post(url, **kwargs, verify=False)
+            response = _session.post(url, **kwargs, verify=False)
             logging.info(f"Post请求{url}成功！")
             return response
         except Exception as ex:
@@ -176,7 +180,7 @@ def singleDownload(url: str, path: str, exist: bool = True, force: bool = False,
         if exist and not force:
             path = getRepeatFileName(path)
         logging.info(f"正在单线程下载文件{url}到{path}！")
-        response = requests.get(url, headers=header, stream=True, verify=False)
+        response = _session.get(url, headers=header, stream=True, verify=False)
         with open(path, "wb") as f:
             for chunk in response.iter_content(chunk_size=1024):
                 if chunk:
@@ -244,7 +248,7 @@ class DownloadSession:
             if exist and not force:
                 path = getRepeatFileName(path)
             logging.info(f"正在多线程下载文件{url}到{path}！")
-            response = requests.get(url, headers=header, stream=True, verify=False)
+            response = _session.get(url, headers=header, stream=True, verify=False)
             total_size = int(response.headers.get("content-length", 1024))
             block_size = 1024
             progress = 0
